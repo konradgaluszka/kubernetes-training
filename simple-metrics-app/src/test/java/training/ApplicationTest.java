@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import training.jobs.Job;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
@@ -59,6 +61,21 @@ public class ApplicationTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/jobs")).
                 andExpect(MockMvcResultMatchers.status().isOk()).
                 andExpect(jsonPath("$", hasSize(1)));
+
+    }
+
+    @Test
+    public void setsBasicMetrics() throws Exception {
+        //when
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/jobs")
+                .content(job("job-1")))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.get("/actuator/prometheus")).
+                andExpect(MockMvcResultMatchers.status().isOk()).
+                andExpect(content().string(containsString("list_jobs_total 1.0")));
 
     }
 
