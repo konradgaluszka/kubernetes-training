@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-metrics-app
+spec:
+  selector:
+    matchLabels:
+      app: simple-metrics-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: simple-metrics-app
+    spec:
+      containers:
+        - name: app
+          image: simple-metrics-app:1.0
+          ports:
+          - containerPort: 8080

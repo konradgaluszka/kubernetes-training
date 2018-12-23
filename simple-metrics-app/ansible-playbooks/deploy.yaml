@@ -1,0 +1,23 @@
+---
+- hosts: kube-cluster
+  gather_facts: no
+  become: yes
+  tasks:
+
+  - name: Register workdir
+    set_fact:
+      workdir: "{{ playbook_dir }}/.."
+
+  - name: Build application jar
+    shell: "cd {{ workdir }} && mvn clean install"
+
+  - name: Create docker image
+    shell: "cd {{ workdir }} && docker build -t simple-metrics-app:1.0 ."
+
+  - name: Deploy to kubernes
+    shell: "kubectl create -f templates/deployment.yaml"
+
+  - name: Clean up after build
+    shell: "rm -rf {{ workdir }}/target"
+
+
